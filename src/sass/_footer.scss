@@ -1,0 +1,18 @@
+.footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-bottom: 30px;
+}
+
+.load-more {
+    text-transform: uppercase;
+    font-weight: 500;
+    font-size: medium;
+    padding: 15px 20px;
+    background-color: #007117;
+    border-style: none;
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+}

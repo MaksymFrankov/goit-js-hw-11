@@ -5,20 +5,26 @@
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="/src/sass/index.scss">
+  <link rel="stylesheet" href="./sass/index.scss">
   <title>Homework 11</title>
 </head>
 
 <body>
-<form class="search-form" id="search-form">
-  <input type="text" name="searchQuery" autocomplete="off" placeholder="Search images..." autofocus required />
-  <button type="submit">Search</button>
-</form>
-
-    <div class="gallery">
-      <!-- Карточки изображений -->
+    <form class="search" id="search">
+      <input 
+      class="input" 
+      type="text" 
+      name="searchQuery" 
+      autocomplete="off" 
+      placeholder="Search images..." 
+      />
+      <button class="submitBtn" type="submit">&#x1F50E;&#xFE0E;</button>
+    </form>
+  
+    <div class="gallery"> </div>
+    <div class="footer">
+      <button type="button" class="load-more">Load more</button>
     </div>
-    <button type="button" class="load-more">Load more</button>
   <script src="index.js" type="module"></script>
 </body>
 
