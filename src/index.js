@@ -39,11 +39,12 @@ function fetchImg() {
          })
          .then(images => {
             console.log(images.hits);
-            refs.gallery.innerHTML = imgCardTpl(images.hits);
-             
-            //  else  (images.hits.lenght<=1) {
-            //       Notiflix.Notify.failure("Sorry, there are no images matching your search query. Please try again.");
-            //  }
+             if (images.hits.length > 0) {
+                 refs.gallery.innerHTML = imgCardTpl(images.hits);
+             }
+             else  {
+                  Notiflix.Notify.failure("Sorry, there are no images matching your search query. Please try again.");
+             }
          })
 
 };
