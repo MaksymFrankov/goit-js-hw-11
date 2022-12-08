@@ -1,5 +1,7 @@
 import imgCardTpl from './tamplates/imgCard.hbs';
 import Notiflix from 'notiflix';
+import SimpleLightbox from "simplelightbox";
+import "simplelightbox/dist/simple-lightbox.min.css";
 
 const refs = {
     gallery: document.querySelector(".gallery"),
@@ -21,16 +23,21 @@ const options = {
     
 }
 
-refs.searchBtn.addEventListener('click' ,onBtnClick);
+refs.searchBtn.addEventListener('click' ,onSearchBtnClick);
+refs.loadMoreBtn.addEventListener('click', onLoadMoreBtnClick);
 
-function onBtnClick(e) {
+
+function onSearchBtnClick(e) {
     e.preventDefault();
     options.q = refs.inputedQ.value;
-    fetchImg()
-    toggleClass()
+    fetchImg();
+    toggleHidden();
 }
 
-
+function onLoadMoreBtnClick() {
+    options.page++;
+    fetchImg();
+}
 
 function fetchImg() {
     let res;
@@ -39,7 +46,7 @@ function fetchImg() {
             return res.json();
          })
          .then(images => {
-            console.log(images.hits);
+            console.log(images);
              if (images.hits.length > 0) {
                  refs.gallery.innerHTML = imgCardTpl(images.hits);
              }
@@ -50,8 +57,10 @@ function fetchImg() {
 
 };
 
-function toggleClass() {
-   refs.loadMoreBtn.classList.toggle("hidden");
+function toggleHidden() {
+    refs.loadMoreBtn.classList.toggle("hidden");
+    
+    // add / remove
 }
 
 function onFetchError(err) {
