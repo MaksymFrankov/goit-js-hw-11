@@ -66,3 +66,5 @@ function toggleHidden() {
 function onFetchError(err) {
     console.log(err);
 }
+// скролл + прокрутка + лайтбокс 
+// После первого запроса при каждом новом поиске выводить уведомление в котором будет написано сколько всего нашли изображений (свойство totalHits). Текст уведомления "Hooray! We found totalHits images."
