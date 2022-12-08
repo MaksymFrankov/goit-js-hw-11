@@ -4,8 +4,8 @@ import Notiflix from 'notiflix';
 const refs = {
     gallery: document.querySelector(".gallery"),
     searchBtn: document.querySelector(".submitBtn"),
-    inputedQ: document.querySelector(".input")
-
+    inputedQ: document.querySelector(".input"),
+    loadMoreBtn: document.getElementById("load-more"),
 }
 
 const options = {
@@ -27,6 +27,7 @@ function onBtnClick(e) {
     e.preventDefault();
     options.q = refs.inputedQ.value;
     fetchImg()
+    toggleClass()
 }
 
 
@@ -48,6 +49,10 @@ function fetchImg() {
          })
 
 };
+
+function toggleClass() {
+   refs.loadMoreBtn.classList.toggle("hidden");
+}
 
 function onFetchError(err) {
     console.log(err);
