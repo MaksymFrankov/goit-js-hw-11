@@ -3,6 +3,7 @@ import Notiflix from 'notiflix';
 import SimpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
 import debounce from "lodash.debounce";
+import axios from 'axios';
 
 
 const refs = {
@@ -19,67 +20,105 @@ const options = {
     image_type : 'photo',
     orientation :  'horizontal',
     safesearch : true,
-    page: 0,
+    page: 1,
 }
 const host = `https://pixabay.com/api/`;
 
 refs.searchBtn.addEventListener('click' ,onSearchBtnClick);
-refs.loadMoreBtn.addEventListener('click', onLoadMoreBtnClick);
 
 
 function onSearchBtnClick(e) {
     e.preventDefault();
+    window.removeEventListener("scroll", handleInfinityScroll);
     options.q = refs.inputedQ.value;
     refs.gallery.innerHTML = '';
-    options.page = 0;
-    fetchImg();
-    toggleHidden();
-}
-
-function onLoadMoreBtnClick() {
+    options.page = 1;
     fetchImg();
 }
 
 
 
-function fetchImg() {
-    options.page++;
-    let res;
-    /*
-    `${options.url}?key=${options.KEY}&q=${options.q}&image_type=${options.image_type}&orientation=${options.orientation}&sefesearch=${options.safesearch}&page=${options.page}&per_page=${options.PER_PAGE}`
-    */
+
+
+async function fetchImg() {
     let url = [];
     for (const param in options)
     {
         url.push(`${param}=${options[param]}`);
     }
-    res = fetch(`${host}?${url.join('&')}`)
+    await axios.get(`${host}?${url.join('&')}`)
         .then(res => {
-            return res.json();
-        })
-        .then(res => {
-            renderGallery(res);
-            return res;
-        })
-        .then(res => {
-            if (options.page == 1)
-                Notiflix.Notify.info(`Hooray! We found ${res.totalHits} images.`)
+            if (res.data.totalHits > 0) {
+                renderGallery(res.data);
+                NotifyFoundImages(res.data.totalHits);
+                ScrollPage();
+                window.addEventListener("scroll", handleInfinityScroll);
+            }
+            else {
+                NotifyNoImagesFound()
+            }
         })
         .catch(err => onFetchError(err))
 
 };
 
-function renderGallery(images)
-{
-    console.log(images)
+function renderGallery(images) {
     if (images.hits.length > 0) {
         refs.gallery.innerHTML += imgCardTpl(images.hits);
     }
-    else  {
-         Notiflix.Notify.failure("Sorry, there are no images matching your search query. Please try again.");
+    else {
+        EndOfRange();
     }
 
-    let gallery = new SimpleLightbox(".gallery a", {
+    ActivateLightbox();
+}
+
+
+function onFetchError(err) {
+    if (err.response.status == 400)
+        EndOfRange();
+    //console.log(err)
+}
+
+const EndOfRange = debounce(() => { Notiflix.Notify.failure("We're sorry, but you've reached the end of search results.") }, 3000, { 'maxWait': 0, 'leading': true, 'trailing':false});
+
+
+
+const handleInfinityScroll = () => {
+    const EndOfPage = window.innerHeight + window.scrollY >= document.body.offsetHeight;
+
+    if (EndOfPage) {
+        options.page++;
+        fetchImg();
+    }
+}
+
+function NotifyFoundImages(count) {
+    if (options.page == 1 && count > 0)
+        Notiflix.Notify.info(`Hooray! We found ${count} images.`)
+}
+
+function ScrollPage()
+{
+    if (options.page == 1) return;
+
+    const { height: cardHeight } = document
+        .querySelector(".gallery")
+        .firstElementChild.getBoundingClientRect();
+    
+    window.scrollTo({
+        top: window.scrollY + cardHeight,
+        behavior: "smooth"
+    })
+}
+
+function NotifyNoImagesFound() {
+    Notiflix.Notify.failure("Sorry, there are no images matching your search query. Please try again.");
+
+    }
+    
+function ActivateLightbox() {
+        let gallery = new SimpleLightbox(".gallery a", {
         captionsData: "alt",
         captionsDelay: 250,
         doubleTapZoom: 1,
@@ -92,28 +131,9 @@ function renderGallery(images)
     });
 }
 
-function toggleHidden() {
-    refs.loadMoreBtn.classList.toggle("hidden");
-    
-    // add / remove
-}
-
-function onFetchError(err) {
-    throttleFun();
-}
-
-const throttleFun = debounce(() => { Notiflix.Notify.failure("We're sorry, but you've reached the end of search results.") }, 3000, { 'maxWait': 0, 'leading': true, 'trailing':false});
-
-const handleInfinityScroll = () => {
-    const EndOfPage = window.innerHeight + window.scrollY >= document.body.offsetHeight;
-
-    if (EndOfPage) {
-        fetchImg();
-    }
-}
-
-window.addEventListener("scroll", handleInfinityScroll);
-
-
-
-
+// function onLoadMoreBtnClick() {
+//     fetchImg();
+// }
+// function toggleHidden() {
+//     refs.loadMoreBtn.classList.toggle("hidden");
+// }
